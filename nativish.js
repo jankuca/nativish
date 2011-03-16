@@ -4,6 +4,7 @@ window.Nativish = {
 		require.ROOT += path;
 		require.js(
 			'lib/utils/utils.js',
+			'lib/lang.js/lang.js',
 			'lib/zepto/zepto.js',
 			'lib/iscroll/iscroll.js',
 			'lib/mongo2sql/mongo2sql.js',
