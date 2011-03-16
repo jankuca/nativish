@@ -6,6 +6,8 @@ window.Nativish = {
 			'lib/utils/utils.js',
 			'lib/zepto/zepto.js',
 			'lib/iscroll/iscroll.js',
+			'lib/mongo2sql/mongo2sql.js',
+			'lib/uuid/uuid.js',
 			'src/App.js',
 			'src/Model.js',
 			'src/Controller.js',
