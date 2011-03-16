@@ -25,7 +25,7 @@ var UIView = UIUnit.inherit(function () {
 
 	'getWrapperElement': function () {
 		return this._wrapper;
-	}.
+	},
 
 	'getClassName': function () {
 		var className = 'UIView';
