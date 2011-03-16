@@ -1,0 +1,6 @@
+[submodule "lib/mongo2sql"]
+	path = lib/mongo2sql
+	url = git://gist.github.com/761760.git
+[submodule "lib/utils"]
+	path = lib/utils
+	url = git://gist.github.com/871775.git

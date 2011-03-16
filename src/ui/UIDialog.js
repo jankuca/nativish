@@ -1,0 +1,1 @@
+var UIDialog = UIUnit.inherit();
