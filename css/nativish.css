@@ -1,0 +1,263 @@
+* {
+	margin: 0;
+	padding: 0;
+}
+body {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: #DDD;
+	font-family: sans-serif;
+	font-size: 14px;
+	-webkit-user-select: none;
+}
+.UIWindow {
+	position: relative;
+	height: 100%;
+	overflow: hidden;
+	background-color: #333;
+}
+.UIWindow > .views {
+	width: 100%;
+}
+.UIWindow > .dialog_cover {
+	z-index: 9;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: #000;
+	-webkit-transition: opacity 0.3s ease;
+}
+.UIMenuDialog {
+	z-index: 10;
+	position: relative;
+	padding: 0 20px 20px;
+	border-top: 1px solid rgba(0, 0, 0, 0.6);
+	background: rgba(82, 90, 102, 0.85);
+	-webkit-transition: -webkit-transform 0.3s ease;
+}
+.UIMenuDialog:before {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 25px;
+	overflow: hidden;
+	border-top: 1px solid rgba(255, 255, 255, 0.7);
+	background: -webkit-gradient(
+		linear,
+		left bottom,
+		left top,
+		from(rgba(102, 111, 125, 0.85)),
+		to(rgba(173, 181, 193, 0.85))
+	);
+	content: ' ';
+}
+.UIMenuDialog ul {
+	padding-top: 10px;
+}
+.UIMenuDialog .UIButton {
+	display: block;
+	position: relative;
+	height: 45px;
+	margin-top: 10px;
+	line-height: 45px;
+	border: 3px solid #34373D;
+	border-radius: 13px;
+	-webkit-border-radius: 13px;
+	background: -webkit-gradient(
+		linear,
+		left bottom,
+		left top,
+		from(#BDBFC2),
+		color-stop(0.5, #BABABB),
+		color-stop(0.51, #CFD0D1),
+		color-stop(0.99, #EDEDEE),
+		to(#FBFBFB)
+	);
+	background-clip: content-box;
+	-webkit-background-clip: content;
+	box-shadow: #717171 0 1px 0;
+	-webkit-box-shadow: #717171 0 1px 0;
+	color: #000;
+	font-size: 20px;
+	font-weight: bold;
+	text-align: center;
+	text-shadow: rgba(255, 255, 255, 0.3) 0 1px 0;
+}
+.UIMenuDialog .UIButton.cancel {
+	background: -webkit-gradient(
+		linear,
+		left bottom,
+		left top,
+		from(#252D36),
+		color-stop(0.5, #171F28),
+		color-stop(0.51, #272D37),
+		color-stop(0.99, #5E636A),
+		to(#6C7178)
+	);
+	color: #FFF;
+	text-shadow: rgba(0, 0, 0, 0.3) 0 -1px 0;
+}
+.UINavigationBar {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 45px;
+	background: -webkit-gradient(
+		linear,
+		left bottom,
+		left top,
+		from(#000),
+		color-stop(0.01, #111),
+		color-stop(0.5, #050505),
+		color-stop(0.51, #111),
+		color-stop(0.99, #333),
+		to(#888)
+	);
+	color: #FFF;
+	-webkit-transition: background 0.3s ease;
+}
+.UINavigationBar[data-view-class="UIErrorView"] {
+	background: -webkit-gradient(
+		linear,
+		left bottom,
+		left top,
+		from(#AB2F2F),
+		color-stop(0.01, #F54444),
+		color-stop(0.5, #F53333),
+		color-stop(0.51, #FF3333),
+		color-stop(0.99, #FF4444),
+		to(#FF6969)
+	);
+}
+.UINavigationBar > .backs {
+	z-index: 2;
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+.UINavigationBar > .actions {
+	z-index: 2;
+	position: absolute;
+	top: 0;
+	right: 0;
+}
+.UINavigationBar h2 {
+	z-index: 1;
+	position: absolute;
+	left: 0;
+	right: 0;
+	height: 45px;
+	line-height: 45px;
+	text-align: center;
+	-webkit-transition-property: opacity, -webkit-transform;
+	-webkit-transition-duration: 0.3s;
+	-webkit-transition-timing-function: ease;
+}
+.UINavigationBar .UIButton {
+	position: absolute;
+	top: 0;
+	height: 40px;
+	padding: 5px 4px 0;
+	opacity: 1;
+}
+.UINavigationBar .UIButton span {
+	display: inline-block;
+	min-width: 20px;
+	height: 33px;
+	line-height: 33px;
+	padding: 0 5px;
+	border: 1px solid rgba(0, 0, 0, 0.3);
+	border-radius: 5px;
+	-webkit-border-radius: 5px;
+	background: #777;
+	background: -webkit-gradient(
+		linear,
+		left bottom,
+		left top,
+		from(rgba(0, 0, 0, 0.05)),
+		color-stop(0.5, rgba(0, 0, 0, 0.05)),
+		to(rgba(255, 255, 255, 0.15))
+	);
+	background-clip: padding-box;
+	-webkit-background-clip: padding;
+	box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+	-webkit-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+.UINavigationBar > .backs .UIButton {
+	left: 0;
+}
+.UINavigationBar > .actions .UIButton {
+	right: 0;
+}
+.UINavigationBar .UIBackButton {
+	white-space: nowrap;
+	-webkit-transition-property: opacity, -webkit-transform;
+	-webkit-transition-duration: 0.3s;
+	-webkit-transition-timing-function: ease;
+}
+.views > div,
+.UIView {
+	height: 100%;
+	overflow: hidden;
+	background: #DDD;
+	list-style: none;
+}
+.UIView > .count {
+	clear: both;
+	height: 45px;
+	line-height: 45px;
+	text-align: center;
+}
+.UIErrorView {
+	padding: 50px 0 20px;
+	color: #A00;
+	font-size: 16px;
+	font-weight: bold;
+	text-align: center;
+}
+.UITableView {
+	background: #FFF;
+}
+.UIGridView {
+	background: #333;
+	color: #DDD;
+}
+.UICell {
+	height: 25px;
+	line-height: 25px;
+	padding: 10px;
+	border-bottom: 1px solid #CCC;
+	background: #FFF;
+	color: #000;
+	font-size: 17px;
+	font-weight: bold;
+}
+.UICell:hover {
+	background: #CFA;
+}
+.UIGridView .UICell {
+	float: left;
+	width: 86px;
+	height: 16px;
+	padding-top: 70px;
+	border-color: #111;
+	border-right: 1px solid #111;
+	background: #222;
+	color: #CCC;
+	font-size: 13px;
+	text-align: center;
+}
+.UIGridView .UICell:hover {
+	background: #444;
+	color: #FFF;
+}
+.UIGridView .UICell:nth-child(3n) {
+	border-right-width: 0;
+}
