@@ -9,6 +9,7 @@ window.Nativish = {
 			'lib/mongo2sql/mongo2sql.js',
 			'lib/uuid/uuid.js',
 			'src/App.js',
+			'src/Operation.js',
 			'src/Model.js',
 			'src/Controller.js',
 			'src/ui/UIUnit.js',

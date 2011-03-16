@@ -12,6 +12,8 @@ var App = Function.inherit(function (params) {
 			document.body.innerHTML = '';
 			document.body.appendChild(app.window.getElement());
 
+			app._queue = new OperationQueue('_queue');
+
 			app.request(cv, params);
 		};
 
@@ -70,6 +72,10 @@ var App = Function.inherit(function (params) {
 		} else {
 			alert('404 (Controller)');
 		}
+	},
+
+	'queue': function (op, callback) {
+		this._queue.push(op, callback);
 	},
 
 	'setMigrations': function (migrations) {
