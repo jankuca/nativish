@@ -23,3 +23,7 @@ var UIUnit = Function.inherit(function (info) {
 		$(this.getElement()).undelegate(selector, event);
 	},
 });
+
+UIUnit.inherit = function (init, props) {
+	return Function.inherit.call(this, init, props, true);
+};
