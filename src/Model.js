@@ -244,7 +244,9 @@ Model = Function.inherit(function (doc) {
 					throw new Error('No parent association');
 				}
 				doc._parent = (value instanceof Model) ? value[app.MODE === 'offline' ? 'id' : value.constructor.api_field] : value;
-				this._cache.parent = (value instanceof Model) ? value : undefined;
+				if (app.MODE !== 'offline') {
+					this._cache.parent = (value instanceof Model) ? value : undefined;
+				}
 				_changed = true;
 			},
 		}
@@ -322,6 +324,8 @@ Model = Function.inherit(function (doc) {
 		if (arguments.length === 1) {
 			callback = arguments[0];
 			options = {};
+		} else if (arguments.length === 0) {
+			options = {};
 		}
 
 		if (!this.changed) {
@@ -354,7 +358,8 @@ Model = Function.inherit(function (doc) {
 			model = this,
 			selector = { _id: this.id },
 			data = {},
-			sql;
+			sql,
+			execute;
 		if (this.constructor.namespace !== null) {
 			if (!app.namespace) {
 				throw new Error('Global namespace is not defined');
@@ -371,14 +376,18 @@ Model = Function.inherit(function (doc) {
 				model.stored = true;
 				model.changed = false;
 
-				callback(null);
+				if (typeof callback === 'function') {
+					callback(null);
+				}
 				if (options.online !== false) {
 					app.queue(op);
 				}
 			}, function (tx, err) {
 				console.error('SQL Error: ' + err.message + '; ' + JSON.stringify(err));
 				console.log('The SQL query was:', sql[0], sql[1]);
-				callback(err);
+				if (typeof callback === 'function') {
+					callback(err);
+				}
 			});
 		};
 
@@ -404,7 +413,9 @@ Model = Function.inherit(function (doc) {
 
 		var st = new SQLStatement('delete', this.collection),
 			model = this,
-			selector = { _id: this.id };
+			selector = { _id: this.id },
+			sql,
+			execute;
 		if (this.constructor.namespace !== null) {
 			if (!app.namespace) {
 				throw new Error('Global namespace is not defined');
@@ -450,7 +461,7 @@ Model = Function.inherit(function (doc) {
 		}, this);
 
 		rules = this.constructor.prototype.validates_format_of || {};
-		Object.getOwnPropertyNames(rules).forEach(function () {
+		Object.getOwnPropertyNames(rules).forEach(function (key) {
 			if (!rules[key].test(this[key])) {
 				if (errors[key] === undefined) {
 					errors[key] = [];
@@ -685,7 +696,7 @@ Model.has_many = function (has_many) {
 			});
 
 			if (app.MODE === 'offline') {
-				selector._parent = this.id;
+				selector._parent = this.id.toString();
 				return model.all(selector, options, callback);
 			} else {
 				if (this._cache[key]) {
