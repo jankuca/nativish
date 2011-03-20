@@ -1,7 +1,14 @@
 var UIUnit = Function.inherit(function (info) {
 	this._info = info || {};
 	if (typeof this._setup === 'function') {
-		this._element = this._setup();
+		var el = this._element = this._setup();
+		if (info['class'] instanceof Array) {
+			info['class'].forEach(function (className) {
+				el.addClass(className);
+			});
+		} else if (typeof info['class'] === 'string') {
+			el.addClass(info['class']);
+		}
 		this._element.component = this;
 	}
 }, {
