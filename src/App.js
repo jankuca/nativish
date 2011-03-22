@@ -21,19 +21,19 @@ var App = Function.inherit(function (params) {
 			this.MODE = 'offline';
 
 			var createStateTable = function () {
-				this.db.transaction(function (tx) {
+				app.db.transaction(function (tx) {
 					tx.executeSql("CREATE TABLE [_state] ([key], [value])", [],
 						function (tx) {
 							tx.executeSql("INSERT INTO [_state] ([key], [value]) VALUES (?, ?)", ['last_migration', -1], function (tx, result) {
-								this._dbMigrate(-1, startup);
-							}.bind(this));
-						}.bind(this),
+								app._dbMigrate(-1, startup);
+							});
+						},
 						function (tx, error) {
 							throw error;
 						}
 					);
-				}.bind(this));
-			}.bind(this);
+				});
+			};
 
 			this.db = window.openDatabase(this._params.db, '1.0', this._params.db_title, this._params.db_size);
 
@@ -91,7 +91,8 @@ var App = Function.inherit(function (params) {
 			throw 'No migration file provided';
 		}
 
-		var m = last_migration + 1,
+		var app = this,
+			m = last_migration + 1,
 			mm = app._migrations.length,
 			migrations = app._migrations,
 			q, qq, queries, query;
@@ -106,7 +107,7 @@ var App = Function.inherit(function (params) {
 				q = 0;
 				qq = queries.length;
 
-				this.db.transaction(function (tx) {
+				app.db.transaction(function (tx) {
 					var q_iter = function (tx) {
 						query = queries[q];
 						tx.executeSql(
@@ -123,7 +124,7 @@ var App = Function.inherit(function (params) {
 				callback();
 			}
 			++m;
-		}.bind(this);
+		};
 		m_iter();
 	},
 });
