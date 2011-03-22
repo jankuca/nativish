@@ -1,5 +1,6 @@
 var UIUnit = Function.inherit(function (info) {
-	this._info = info || {};
+	info = info || {};
+	this._info = info;
 	if (typeof this._setup === 'function') {
 		var el = this._element = this._setup();
 		if (info['class'] instanceof Array) {
