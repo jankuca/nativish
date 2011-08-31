@@ -343,7 +343,7 @@ Model.fetchAll = function (M, selector, options) {
 };
 
 /**
- * Either searches the local database or requests search results from the API
+ * Searches the local database
  * @param {Function} M The model constructor to use for the results
  * @param {string} field The field in which to search
  * @param {Array.<string>} words List of words for which to search
