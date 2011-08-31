@@ -1,0 +1,12 @@
+[submodule "lib/deferred"]
+	path = lib/deferred
+	url = git://gist.github.com/1124801.git
+[submodule "lib/mongo2sql"]
+	path = lib/mongo2sql
+	url = git://gist.github.com/761760.git
+[submodule "lib/string.inflection"]
+	path = lib/string.inflection
+	url = git://github.com/jankuca/inflection-js.git
+[submodule "lib/uuid"]
+	path = lib/uuid
+	url = git://gist.github.com/789412.git
