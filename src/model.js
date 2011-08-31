@@ -1,5 +1,3 @@
-var app = { MODE: 'online' };
-
 goog.require('uuid');
 goog.require('goog.json');
 goog.require('Deferred');
