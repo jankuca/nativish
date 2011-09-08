@@ -506,7 +506,7 @@ Model.create = function (name) {
 	 * @param {Object=} options
 	 */
 	M.one = function (selector, options) {
-		Model.one(M, selector, options);
+		return Model.one(M, selector, options);
 	};
 
 	/**
@@ -514,7 +514,7 @@ Model.create = function (name) {
 	 * @param {Object=} options
 	 */
 	M.all = function (selector, options) {
-		Model.all(M, selector, options);
+		return Model.all(M, selector, options);
 	};
 
 	/**
@@ -522,7 +522,7 @@ Model.create = function (name) {
 	 * @param {Array.<string>} words List of words for which to search
 	 */
 	M.search = function (field, words) {
-		Model.all(M, field, words);
+		return Model.search(M, field, words);
 	};
 
 	Model.models_[name] = M;
