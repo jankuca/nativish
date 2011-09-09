@@ -5,7 +5,7 @@ goog.require('string.inflection');
 goog.require('nativish.SQLStatement');
 goog.require('nativish.SQLStatement.Modes');
 
-goog.provide('nativish.Model');
+goog.provide('nativish.nativish.Model');
 
 
 /**
@@ -16,7 +16,7 @@ goog.provide('nativish.Model');
  * @param {boolean=} remote Whether the model data were loaded from a remote
  *   location (API). This is to be used only internally.
  */
-var Model = function (doc, remote) {
+nativish.Model = function (doc, remote) {
 	doc = doc || {};
 
 	/**
@@ -61,7 +61,7 @@ var Model = function (doc, remote) {
  * @param {Object=} options
  * @return {Deferred}
  */
-Model.prototype.get = function (association, selector, options) {
+nativish.Model.prototype.get = function (association, selector, options) {
 	var dfr = new Deferred();
 
 	if (!this.id) {
@@ -70,16 +70,16 @@ Model.prototype.get = function (association, selector, options) {
 	}
 
 	var association_name = string.inflection.toSingular(association);
-	var M = Model.models_[association_name];
+	var M = nativish.Model.models_[association_name];
 	if (!M) {
 		return dfr.complete('failure',
 			new Error('Unknown model ' + association_name));
 	}
 
 	if (!options.path) {
-		options.path = Model.getRelativeApiPath_(
+		options.path = nativish.Model.getRelativeApiPath_(
 			this.constructor,
-			Model.normalizeSelector_(this.id),
+			nativish.Model.normalizeSelector_(this.id),
 			string.inflection.toTableName(association),
 			options);
 	}
@@ -98,7 +98,7 @@ Model.prototype.get = function (association, selector, options) {
  * Sets values of the given fields to the current unix timestamp
  * @param {...string} var_fields
  */
-Model.prototype.updateTimestamp = function (var_fields) {
+nativish.Model.prototype.updateTimestamp = function (var_fields) {
 	var fields = Array.prototype.concat.call(arguments);
 
 	var ts = Math.floor(new Date().getTime() / 1000);
@@ -111,7 +111,7 @@ Model.prototype.updateTimestamp = function (var_fields) {
  * Merges the current field values with the passed values
  * @param {!Object} values
  */
-Model.prototype.update = function (values) {
+nativish.Model.prototype.update = function (values) {
 	Object.keys(values).forEach(function (field) {
 		this[field] = values[field];
 	}, this);
@@ -121,7 +121,7 @@ Model.prototype.update = function (values) {
  * Saves the resource to the database and/or creates a push queue item
  * @return {Deferred}
  */
-Model.prototype.save = function () {
+nativish.Model.prototype.save = function () {
 	var dfr = new Deferred();
 
 	// TODO: validation
@@ -150,9 +150,9 @@ Model.prototype.save = function () {
 /**
  * Extracts the model's document object to fields and associations
  */
-Model.prototype.extractDoc_ = function () {
+nativish.Model.prototype.extractDoc_ = function () {
 	var doc = this.doc;
-	var skip = Model.skip_fields;
+	var skip = nativish.Model.skip_fields;
 	Object.keys(doc).forEach(function (key) {
 		if (skip.indexOf(key) !== -1) return;
 
@@ -173,7 +173,7 @@ Model.prototype.extractDoc_ = function () {
 /**
  * Fills a model document object with the current state of the model
  */
-Model.prototype.fillDoc_ = function (doc) {
+nativish.Model.prototype.fillDoc_ = function (doc) {
 	doc = doc || this.doc;
 
 	doc['_id'] = this.id;
@@ -191,7 +191,7 @@ Model.prototype.fillDoc_ = function (doc) {
  * Creates a clone of the model's document object
  * @return {!Object}
  */
-Model.prototype.getTempDoc_ = function () {
+nativish.Model.prototype.getTempDoc_ = function () {
 	return /** @type {!Object} */ window.JSON.parse(
 		window.JSON.stringify(this.doc));
 };
@@ -201,43 +201,43 @@ Model.prototype.getTempDoc_ = function () {
  *   for excluding API-specific fields.
  * @type {Array.<string>}
  */
-Model.skip_fields = ['url'];
+nativish.Model.skip_fields = ['url'];
 
 /**
  * Database
  * @type {?Database}
  */
-Model.db = null;
+nativish.Model.db = null;
 
 /**
  * Collection name
  * @type {?string}
  */
-Model.collection_name = null;
-Model.prototype.collection_name = Model.collection_name;
+nativish.Model.collection_name = null;
+nativish.Model.prototype.collection_name = nativish.Model.collection_name;
 
 /**
  * API field
  * The field of which to use the value as an identifier in API paths
  * @type {string}
  */
-Model.api_field = 'id';
+nativish.Model.api_field = 'id';
 
 /**
  * API HTTP request headers
  * The headers with which to provide each HTTP request to the API
  * @type {!Object}
  */
-Model.api_headers = {
+nativish.Model.api_headers = {
 	'x-requested-with': 'XMLHttpRequest'
 };
 
 /**
- * List of defined models via {@code Model.create}
+ * List of defined models via {@code nativish.Model.create}
  * @type {Object.<string, Function>}
  * @private
  */
-Model.models_ = {};
+nativish.Model.models_ = {};
 
 /**
  * Retrieves the first record matching the selector
@@ -246,10 +246,10 @@ Model.models_ = {};
  * @param {Object=} options
  * @return {Deferred}
  */
-Model.one = function (M, selector, options) {
+nativish.Model.one = function (M, selector, options) {
 	options = options || {};
 	options.limit = 1;
-	return Model.all(M, selector, options);
+	return nativish.Model.all(M, selector, options);
 };
 
 /**
@@ -259,7 +259,7 @@ Model.one = function (M, selector, options) {
  * @param {Object=} options
  * @return {Deferred}
  */
-Model.all = function (M, selector, options) {
+nativish.Model.all = function (M, selector, options) {
 	var dfr = new Deferred();
 
 	options = options || {};
@@ -275,7 +275,7 @@ Model.all = function (M, selector, options) {
 			return dfr.complete('failure', new Error('Missing collection name'));
 		}
 
-		selector = Model.normalizeSelector_(selector);
+		selector = nativish.Model.normalizeSelector_(selector);
 
 		var st = new SQLStatement(M.db, M.collection_name,
 			SQLStatement.Modes.SELECT);
@@ -292,7 +292,7 @@ Model.all = function (M, selector, options) {
 		}, dfr);
 	} else {
 		// online-only mode
-		Model.fetchAll(M, selector, options).pipe(dfr);
+		nativish.Model.fetchAll(M, selector, options).pipe(dfr);
 	}
 
 	return dfr;
@@ -305,10 +305,10 @@ Model.all = function (M, selector, options) {
  * @param {Object=} options
  * @return {Deferred}
  */
-Model.fetchOne = function (M, selector, options) {
+nativish.Model.fetchOne = function (M, selector, options) {
 	options = options || {};
 	options.limit = 1;
-	return Model.fetchAll(M, selector, options);
+	return nativish.Model.fetchAll(M, selector, options);
 };
 	
 /**
@@ -318,14 +318,14 @@ Model.fetchOne = function (M, selector, options) {
  * @param {Object=} options
  * @return {Deferred}
  */
-Model.fetchAll = function (M, selector, options) {
-	selector = Model.normalizeSelector_(selector);
+nativish.Model.fetchAll = function (M, selector, options) {
+	selector = nativish.Model.normalizeSelector_(selector);
 	options = options || {};
 
 	var dfr = new Deferred();
 
-	var path = Model.getRelativeApiPath_(M, selector, null, options);
-	Model.api('GET', path).then(function (response) {
+	var path = nativish.Model.getRelativeApiPath_(M, selector, null, options);
+	nativish.Model.api('GET', path).then(function (response) {
 		var models = [];
 		if (Array.isArray(response)) {
 			for (var i = 0, ii = response.length; i < ii; ++i) {
@@ -348,7 +348,7 @@ Model.fetchAll = function (M, selector, options) {
  * @param {string} field The field in which to search
  * @param {Array.<string>} words List of words for which to search
  */
-Model.search = function (M, field, words) {
+nativish.Model.search = function (M, field, words) {
 	var dfr = new Deferred();
 
 	if (!words.length) {
@@ -373,14 +373,14 @@ Model.search = function (M, field, words) {
  * @param {Object=} data Request body
  * @return {Deferred}
  */
-Model.api = function (method, path, data) {
+nativish.Model.api = function (method, path, data) {
 	var dfr = new Deferred();
 
 	var xhr = new XMLHttpRequest();
 	xhr.open(method, path, true);
 
 	// headers
-	var headers = Model.api_headers;
+	var headers = nativish.Model.api_headers;
 	Object.keys(headers).forEach(function (key) {
 		xhr.setRequestHeader(key, headers);
 	});
@@ -412,7 +412,7 @@ Model.api = function (method, path, data) {
  * @param {!Object|string|number} selector The selector to normalize
  * @return {!Object}
  */
-Model.normalizeSelector_ = function (selector) {
+nativish.Model.normalizeSelector_ = function (selector) {
 	if (typeof selector !== 'object') {
 		return { '_id': selector };
 	}
@@ -428,11 +428,11 @@ Model.normalizeSelector_ = function (selector) {
  * @param {Object=} options
  * @return {string}
  */
-Model.getRelativeApiPath_ = function (M, selector, association, options) {
+nativish.Model.getRelativeApiPath_ = function (M, selector, association, options) {
 	var path = options.path;
 	if (!path) {
 		var field = M.api_field.replace(/^_id$/, 'id');
-		path = Model.getRelativeApiPathname_(M, selector[field], association);
+		path = nativish.Model.getRelativeApiPathname_(M, selector[field], association);
 		var query_parts = [];
 		Object.keys(selector).forEach(function (key) {
 			if (key !== field && key.search(':') !== -1) {
@@ -455,7 +455,7 @@ Model.getRelativeApiPath_ = function (M, selector, association, options) {
  * @param {?string=} association An optional association collection name
  * @return {string} The pathname (i.e. /collection_name[/value[/association]])
  */
-Model.getRelativeApiPathname_ = function (M, value, association) {
+nativish.Model.getRelativeApiPathname_ = function (M, value, association) {
 	var pathname = '/' + M.collection_name;
 	if (value) {
 		pathname += '/' + value;
@@ -467,36 +467,36 @@ Model.getRelativeApiPathname_ = function (M, value, association) {
 };
 
 /**
- * Helper constructor used for {@code Model} inheritance
+ * Helper constructor used for {@code nativish.Model} inheritance
  * Note: "Bare" stands for having an empty constructor body and not having
  *   static methods.
  * @constructor
  * @private
  */
-var BareModel_ = function () {};
-BareModel_.prototype = Model.prototype;
+nativish.BareModel_ = function () {};
+nativish.BareModel_.prototype = nativish.Model.prototype;
 
 /**
- * Creates a model constructor that inherits from {@code Model} and gets
+ * Creates a model constructor that inherits from {@code nativish.Model} and gets
  *   static methods for model data retrieval.
  * @param {string} name The new model name; gets used for a collection name,
  *   document object child node field names and API resource URLs.
  */
-Model.create = function (name) {
+nativish.Model.create = function (name) {
 	/**
 	 * @constructor
-	 * @extends {Model}
+	 * @extends {nativish.Model}
 	 */
 	function M(doc, remote) {
-		Model.call(this, doc, remote);
+		nativish.Model.call(this, doc, remote);
 	};
-	M.prototype = new BareModel_();
+	M.prototype = new nativish.BareModel_();
 	M.prototype.constructor = M;
-	M.prototype.super_ = Model;
+	M.prototype.super_ = nativish.Model;
 
 	M.name = name;
-	M.db = Model.db;
-	M.api_field = Model.api_field;
+	M.db = nativish.Model.db;
+	M.api_field = nativish.Model.api_field;
 	M.collection_name = string.inflection.toTableName(
 		string.inflection.toPlural(name));
 	M.prototype.collection_name = M.collection_name;
@@ -506,7 +506,7 @@ Model.create = function (name) {
 	 * @param {Object=} options
 	 */
 	M.one = function (selector, options) {
-		return Model.one(M, selector, options);
+		return nativish.Model.one(M, selector, options);
 	};
 
 	/**
@@ -514,7 +514,7 @@ Model.create = function (name) {
 	 * @param {Object=} options
 	 */
 	M.all = function (selector, options) {
-		return Model.all(M, selector, options);
+		return nativish.Model.all(M, selector, options);
 	};
 
 	/**
@@ -522,10 +522,10 @@ Model.create = function (name) {
 	 * @param {Array.<string>} words List of words for which to search
 	 */
 	M.search = function (field, words) {
-		return Model.search(M, field, words);
+		return nativish.Model.search(M, field, words);
 	};
 
-	Model.models_[name] = M;
+	nativish.Model.models_[name] = M;
 
 	return M;
 };
