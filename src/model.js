@@ -224,6 +224,12 @@ nativish.Model.prototype.collection_name = nativish.Model.collection_name;
 nativish.Model.api_field = 'id';
 
 /**
+ * API root
+ * @type {string}
+ */
+nativish.Model.api_root = '/';
+
+/**
  * API HTTP request headers
  * The headers with which to provide each HTTP request to the API
  * @type {!Object}
@@ -376,6 +382,7 @@ nativish.Model.search = function (M, field, words) {
 nativish.Model.api = function (method, path, data) {
 	var dfr = new Deferred();
 
+	path = nativish.Model.api_root + path;
 	var xhr = new XMLHttpRequest();
 	xhr.open(method, path, true);
 
