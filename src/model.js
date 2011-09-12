@@ -399,7 +399,11 @@ nativish.Model.api = function (method, path, data) {
 			try {
 				result = goog.json.unsafeParse(xhr.responseText);
 			} finally {
-				dfr.complete(xhr.status < 400 ? 'success' : 'failure', result);
+				if (xhr.status < 400) {
+					dfr.complete('success', result);
+				} else {
+					dfr.complete('failure', status);
+				}
 			}
 		}
 	};
