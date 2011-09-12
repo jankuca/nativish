@@ -125,7 +125,7 @@ SQLStatement.prototype.getSelectSQL_ = function () {
 	var params = [];
 
 	chunks.push('SELECT');
-	var fields = options.fields;
+	var fields = options.fields || [];
 	if (fields.length) {
 		fields = fields.map(function (field) {
 			return (field.search('[') === -1) ? '[' + field + ']' : field;
