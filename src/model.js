@@ -274,7 +274,7 @@ nativish.Model.all = function (M, selector, options) {
 	}
 
 	if (!options.online || app.MODE !== 'online') {
-		if (!M.db) {
+		if (!nativish.Model.db) {
 			return dfr.complete('failure', new Error('Missing database'));
 		}
 		if (!M.collection_name) {
@@ -283,7 +283,7 @@ nativish.Model.all = function (M, selector, options) {
 
 		selector = nativish.Model.normalizeSelector_(selector);
 
-		var st = new SQLStatement(M.db, M.collection_name,
+		var st = new SQLStatement(nativish.Model.db, M.collection_name,
 			SQLStatement.Modes.SELECT);
 		st.selector = selector;
 		st.options = options;
@@ -364,7 +364,7 @@ nativish.Model.search = function (M, field, words) {
 	field = 'lower([' + field.replace(':', '__') + '])';
 	var selector = {};
 	selector[field] = { '$search': words };
-	var st = new SQLStatement(M.db, M.collection_name,
+	var st = new SQLStatement(nativish.Model.db, M.collection_name,
 		SQLStatement.Modes.SELECT);
 	st.selector = selector;
 	st.execute().pipe(dfr);
@@ -502,7 +502,6 @@ nativish.Model.create = function (name) {
 	M.prototype.super_ = nativish.Model;
 
 	M.name = name;
-	M.db = nativish.Model.db;
 	M.api_field = nativish.Model.api_field;
 	M.collection_name = string.inflection.toTableName(
 		string.inflection.toPlural(name));
