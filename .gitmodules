@@ -9,4 +9,4 @@
 	url = git://gist.github.com/789412.git
 [submodule "lib/xdxhr"]
 	path = lib/xdxhr
-	url = github:MarcoSharper/xdxhr.git
+	url = git://gist.github.com/MarcoSharper/xdxhr.git
