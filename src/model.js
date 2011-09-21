@@ -1,3 +1,4 @@
+goog.require('mongo2sql');
 goog.require('uuid');
 goog.require('goog.json');
 goog.require('Deferred');
@@ -361,7 +362,7 @@ nativish.Model.search = function (M, field, words) {
 		return dfr.complete('failure', new Error('No words specified'));
 	}
 
-	field = 'lower([' + field.replace(':', '__') + '])';
+	field = 'lower([' + field.replace(':', mongo2sql.NAMESPACE_SEPARATOR) + '])';
 	var selector = {};
 	selector[field] = { '$search': words };
 	var st = new SQLStatement(nativish.Model.db, M.collection_name,

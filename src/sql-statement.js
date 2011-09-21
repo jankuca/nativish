@@ -139,14 +139,21 @@ SQLStatement.prototype.getSelectSQL_ = function () {
 
 	if (Object.keys(selector).length) {
 		chunks.push('WHERE');
-		chunks.push(mongo2sql.stringify(selector));
+		var res = mongo2sql.stringify(selector);
+		chunks.push(res.sql);
+		params.push.apply(params, res.params);
 	}
 
 	var sort = options.sort;
+	if (typeof sort === 'string') {
+		var sort_field = sort;
+		sort = {};
+		sort[sort_field] = 1;
+	}
 	if (sort) {
 		chunks.push('ORDER BY');
 		Object.keys(sort).forEach(function (field) {
-			chunks.push('lower([' + field + '])');
+			chunks.push('lower([' + field.replace(':', mongo2sql.NAMESPACE_SEPARATOR) + '])');
 			chunks.push(sort[field] > 0 ? 'ASC' : 'DESC');
 		});
 	}
@@ -199,7 +206,9 @@ SQLStatement.prototype.getUpdateSQL_ = function () {
 
 	if (Object.keys(selector).length) {
 		chunks.push('WHERE');
-		chunks.push(mongo2sql.stringify(selector));
+		var res = mongo2sql.stringify(selector);
+		chunks.push(res.sql);
+		params.push.apply(params, res.params);
 	}
 
 	var sql = chunks.join(' ');
@@ -217,7 +226,9 @@ SQLStatement.prototype.getDeleteSQL_ = function () {
 
 	if (Object.keys(selector).length) {
 		chunks.push('WHERE');
-		chunks.push(mongo2sql.stringify(selector));
+		var res = mongo2sql.stringify(selector);
+		chunks.push(res.sql);
+		params.push.apply(params, res.params);
 	}
 
 	var sql = chunks.join(' ');
