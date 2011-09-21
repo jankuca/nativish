@@ -128,7 +128,7 @@ SQLStatement.prototype.getSelectSQL_ = function () {
 	var fields = options.fields || [];
 	if (fields.length) {
 		fields = fields.map(function (field) {
-			return (field.search('[') === -1) ? '[' + field + ']' : field;
+			return (field.search(/\[/) === -1) ? '[' + field + ']' : field;
 		});
 		chunks.push(fields.join(', '));
 	} else {
@@ -177,10 +177,12 @@ SQLStatement.prototype.getInsertSQL_ = function () {
 	chunks.push('INSERT INTO', this.collection_);
 
 	var fields = Object.keys(data).map(function (field) {
-		return (field.search('[') === -1) ? '[' + field + ']' : field;
+		params.push(data[field]);
+		field = (field.search(/\[/) === -1) ? '[' + field + ']' : field;
+		return field.replace(':', mongo2sql.NAMESPACE_SEPARATOR);
 	});
 	chunks.push('(', fields.join(', '), ') VALUES (');
-	chunks.push(new Array(fields.length + 1).join('?'));
+	chunks.push(new Array(fields.length + 1).join('?, ').replace(/,\s$/, ''));
 	chunks.push(')');
 
 	var sql = chunks.join(' ');
@@ -199,8 +201,10 @@ SQLStatement.prototype.getUpdateSQL_ = function () {
 
 	var fields = [];
 	Object.keys(data).forEach(function (field) {
-		field = (field.search('[') === -1) ? '[' + field + ']' : field;
 		params.push(data[field]);
+		field = (field.search(/\[/) === -1) ? '[' + field + ']' : field;
+		field = field.replace(':', mongo2sql.NAMESPACE_SEPARATOR);
+		fields.push(field + ' = ?');
 	});
 	chunks.push(fields.join(', '));
 

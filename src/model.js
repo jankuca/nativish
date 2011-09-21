@@ -6,7 +6,7 @@ goog.require('string.inflection');
 goog.require('nativish.SQLStatement');
 goog.require('nativish.SQLStatement.Modes');
 
-goog.provide('nativish.nativish.Model');
+goog.provide('nativish.Model');
 
 
 /**
@@ -52,6 +52,12 @@ nativish.Model = function (doc, remote) {
 	 */
 	this.remote = Boolean(remote);
 
+	/**
+	 * Cached parent model
+	 * @type {Object}
+	 */
+	this.cached_parent_ = null;
+
 	this.extractDoc_();
 };
 
@@ -96,6 +102,26 @@ nativish.Model.prototype.get = function (association, selector, options) {
 };
 
 /**
+ * Retrieves associated records
+ * @param {string} association The associated collection name
+ * @return {Deferred}
+ */
+nativish.Model.prototype.getParent = function (association) {
+	var dfr = new Deferred();
+
+	if (this.cached_parent_) {
+		return dfr.complete('success', this.cached_parent_);
+	}
+
+	var M = nativish.Model.models_[association];
+	if (!M) {
+		return dfr.complete('failure',
+			new Error('Unknown model ' + association));
+	}
+	return M.one(this.parent);
+};
+
+/**
  * Sets values of the given fields to the current unix timestamp
  * @param {...string} var_fields
  */
@@ -130,7 +156,7 @@ nativish.Model.prototype.save = function () {
 	var doc = this.getTempDoc_();
 	this.fillDoc_(doc);
 
-	var db = this.constructor.db;
+	var db = nativish.Model.db;
 	if (!db) {
 		return dfr.complete('failure', new Error('Missing database'));
 	}
@@ -144,6 +170,10 @@ nativish.Model.prototype.save = function () {
 	st.options.limit = 1;
 	st.data = doc;
 	st.execute().pipe(dfr);
+
+	dfr.then(function () {
+		this.stored = true;
+	}, this);
 
 	return dfr;
 };
@@ -162,8 +192,12 @@ nativish.Model.prototype.extractDoc_ = function () {
 			this[key] = value;
 		} else if (key[0] === '_') { // meta
 			if (key === '_parent' && value !== null) {
-				this.parent = (typeof value === 'object') ?
-					value['_id'] || null : value || null;
+				if (typeof value === 'object') {
+					this.parent = value['_id'] || null;
+					this.cached_parent_ = value;
+				} else {
+					this.parent = value || null;
+				}
 			}
 		} else { // child models
 			
@@ -390,7 +424,7 @@ nativish.Model.api = function (method, path, data) {
 	// headers
 	var headers = nativish.Model.api_headers;
 	Object.keys(headers).forEach(function (key) {
-		xhr.setRequestHeader(key, headers);
+		xhr.setRequestHeader(key, headers[key]);
 	});
 
 	// response
@@ -441,6 +475,7 @@ nativish.Model.normalizeSelector_ = function (selector) {
  * @return {string}
  */
 nativish.Model.getRelativeApiPath_ = function (M, selector, association, options) {
+	options = options || {};
 	var path = options.path;
 	if (!path) {
 		var field = M.api_field.replace(/^_id$/, 'id');
