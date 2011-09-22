@@ -37,7 +37,7 @@ SQLStatement.prototype.execute = function () {
 	var primary_mode = this.getPrimaryMode_();
 	var sql = this.getSQL_(primary_mode);
 	this.executeSQL_(sql[0], sql[1]).then(function (result) {
-		if (result.rowsAffected) {
+		if (result.rowsAffected || result.rows.length) {
 			if (primary_mode === SQLStatement.Modes.SELECT) {
 				dfr.complete('success', result.rows);
 			} else {
