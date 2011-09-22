@@ -64,11 +64,13 @@ nativish.Model = function (doc, remote) {
 /**
  * Retrieves associated records
  * @param {string} association The associated collection name
- * @param {!Object|string|number} selector
+ * @param {Object|string|number=} selector
  * @param {Object=} options
  * @return {Deferred}
  */
 nativish.Model.prototype.get = function (association, selector, options) {
+	options = options || {};
+	selector = selector || {};
 	var dfr = new Deferred();
 
 	if (!this.id) {
@@ -153,8 +155,18 @@ nativish.Model.prototype.save = function () {
 
 	// TODO: validation
 
+	var selector = {
+		'_id': this.id
+	};
 	var doc = this.getTempDoc_();
-	this.fillDoc_(doc);
+
+	if (this.constructor.namespace !== false) {
+		if (!nativish.Model.namespace) {
+			return dfr.complete('failure', new Error('Global namespace not defined'));
+		}
+		selector['_ns'] = nativish.Model.namespace;
+		doc['_ns'] = nativish.Model.namespace;
+	}
 
 	var db = nativish.Model.db;
 	if (!db) {
@@ -163,10 +175,11 @@ nativish.Model.prototype.save = function () {
 	if (!this.collection_name) {
 		return dfr.complete('failure', new Error('Missing collection name'));
 	}
+
+	this.fillDoc_(doc);
+
 	var st = new SQLStatement(db, this.collection_name, SQLStatement.Modes.UPSERT);
-	st.selector = {
-		'_id': this.id
-	};
+	st.selector = selector;
 	st.options.limit = 1;
 	st.data = doc;
 	st.execute().pipe(dfr);
@@ -179,17 +192,47 @@ nativish.Model.prototype.save = function () {
 };
 
 /**
+ * Removes the resource from the database and/or creates a push queue item
+ * @return {Deferred}
+ */
+nativish.Model.prototype.remove = function () {
+	var dfr = new Deferred();
+
+	var db = nativish.Model.db;
+	if (!db) {
+		return dfr.complete('failure', new Error('Missing database'));
+	}
+	if (!this.collection_name) {
+		return dfr.complete('failure', new Error('Missing collection name'));
+	}
+	var st = new SQLStatement(db, this.collection_name, SQLStatement.Modes.DELETE);
+	st.selector = {
+		'_id': this.id
+	};
+	st.options.limit = 1;
+	st.execute().pipe(dfr);
+
+	dfr.then(function () {
+		this.stored = false;
+	}, this);
+
+	return dfr;
+};
+
+/**
  * Extracts the model's document object to fields and associations
  */
 nativish.Model.prototype.extractDoc_ = function () {
 	var doc = this.doc;
 	var skip = nativish.Model.skip_fields;
 	Object.keys(doc).forEach(function (key) {
-		if (skip.indexOf(key) !== -1) return;
+		var field = key.replace('__', ':');
+
+		if (skip.indexOf(field) !== -1) return;
 
 		var value = doc[key];
-		if (key.search(':') !== -1) { // field
-			this[key] = value;
+		if (field.search(':') !== -1) { // field
+			this[field] = value;
 		} else if (key[0] === '_') { // meta
 			if (key === '_parent' && value !== null) {
 				if (typeof value === 'object') {
@@ -212,7 +255,7 @@ nativish.Model.prototype.fillDoc_ = function (doc) {
 	doc = doc || this.doc;
 
 	doc['_id'] = this.id;
-	if (doc['_parent'] !== undefined) {
+	if (doc['_parent'] !== undefined || this.parent) {
 		doc['_parent'] = this.parent;
 	}
 	Object.keys(this).forEach(function (key) {
@@ -243,6 +286,12 @@ nativish.Model.skip_fields = ['url'];
  * @type {?Database}
  */
 nativish.Model.db = null;
+
+/**
+ * Global namespace
+ * @type {?string}
+ */
+nativish.Model.namespace = null;
 
 /**
  * Collection name
@@ -306,6 +355,13 @@ nativish.Model.all = function (M, selector, options) {
 	options = options || {};
 	if (!options.sort && M.sort) {
 		options.sort = M.sort;
+	}
+
+	if (M.namespace !== false) {
+		if (!nativish.Model.namespace) {
+			return dfr.complete('failure', new Error('Global namespace not defined'));
+		}
+		selector['_ns'] = nativish.Model.namespace;
 	}
 
 	if (!options.online || app.MODE !== 'online') {
@@ -437,7 +493,7 @@ nativish.Model.api = function (method, path, data) {
 				if (xhr.status < 400) {
 					dfr.complete('success', result);
 				} else {
-					dfr.complete('failure', status);
+					dfr.complete('failure', xhr.status);
 				}
 			}
 		}
