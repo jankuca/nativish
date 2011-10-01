@@ -78,6 +78,8 @@ nativish.Model.prototype.get = function (association, selector, options) {
 			new Error('Trying to get associations of an unsaved model'));
 	}
 
+	selector['_parent'] = this.id;
+
 	var association_name = string.inflection.toSingular(association);
 	var M = nativish.Model.models_[association_name];
 	if (!M) {
