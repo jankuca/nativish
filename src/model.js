@@ -321,7 +321,8 @@ nativish.Model.api_root = '/';
  * @type {!Object}
  */
 nativish.Model.api_headers = {
-	'x-requested-with': 'XMLHttpRequest'
+	'x-requested-with': 'XMLHttpRequest',
+	'content-type': 'application/x-www-form-urlencoded'
 };
 
 /**
