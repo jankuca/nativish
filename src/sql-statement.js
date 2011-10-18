@@ -144,13 +144,13 @@ SQLStatement.prototype.getSelectSQL_ = function () {
 		params.push.apply(params, res.params);
 	}
 
-	var sort = options.sort;
+	var sort = options.sort || {};
 	if (typeof sort === 'string') {
 		var sort_field = sort;
 		sort = {};
 		sort[sort_field] = 1;
 	}
-	if (sort) {
+	if (Object.keys(sort).length) {
 		chunks.push('ORDER BY');
 		Object.keys(sort).forEach(function (field) {
 			chunks.push('lower([' + field.replace(':', mongo2sql.NAMESPACE_SEPARATOR) + '])');
