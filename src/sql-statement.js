@@ -1,5 +1,6 @@
 goog.require('mongo2sql');
 goog.require('Deferred');
+goog.require('goog.object');
 
 goog.provide('nativish.SQLStatement');
 goog.provide('nativish.SQLStatement.Modes');
@@ -137,7 +138,7 @@ SQLStatement.prototype.getSelectSQL_ = function () {
 
 	chunks.push('FROM', this.collection_);
 
-	if (Object.keys(selector).length) {
+	if (goog.object.getKeys(selector).length) {
 		chunks.push('WHERE');
 		var res = mongo2sql.stringify(selector);
 		chunks.push(res.sql);
@@ -150,9 +151,9 @@ SQLStatement.prototype.getSelectSQL_ = function () {
 		sort = {};
 		sort[sort_field] = 1;
 	}
-	if (Object.keys(sort).length) {
+	if (goog.object.getKeys(sort).length) {
 		chunks.push('ORDER BY');
-		Object.keys(sort).forEach(function (field) {
+		goog.object.getKeys(sort).forEach(function (field) {
 			chunks.push('lower([' + field.replace(':', mongo2sql.NAMESPACE_SEPARATOR) + '])');
 			chunks.push(sort[field] > 0 ? 'ASC' : 'DESC');
 		});
@@ -176,7 +177,7 @@ SQLStatement.prototype.getInsertSQL_ = function () {
 
 	chunks.push('INSERT INTO', this.collection_);
 
-	var fields = Object.keys(data).map(function (field) {
+	var fields = goog.object.getKeys(data).map(function (field) {
 		params.push(data[field]);
 		field = (field.search(/\[/) === -1) ? '[' + field + ']' : field;
 		return field.replace(':', mongo2sql.NAMESPACE_SEPARATOR);
@@ -200,7 +201,7 @@ SQLStatement.prototype.getUpdateSQL_ = function () {
 	chunks.push('UPDATE', this.collection_, 'SET');
 
 	var fields = [];
-	Object.keys(data).forEach(function (field) {
+	goog.object.getKeys(data).forEach(function (field) {
 		params.push(data[field]);
 		field = (field.search(/\[/) === -1) ? '[' + field + ']' : field;
 		field = field.replace(':', mongo2sql.NAMESPACE_SEPARATOR);
@@ -208,7 +209,7 @@ SQLStatement.prototype.getUpdateSQL_ = function () {
 	});
 	chunks.push(fields.join(', '));
 
-	if (Object.keys(selector).length) {
+	if (goog.object.getKeys(selector).length) {
 		chunks.push('WHERE');
 		var res = mongo2sql.stringify(selector);
 		chunks.push(res.sql);
@@ -228,7 +229,7 @@ SQLStatement.prototype.getDeleteSQL_ = function () {
 
 	chunks.push('DELETE FROM', this.collection_);
 
-	if (Object.keys(selector).length) {
+	if (goog.object.getKeys(selector).length) {
 		chunks.push('WHERE');
 		var res = mongo2sql.stringify(selector);
 		chunks.push(res.sql);
