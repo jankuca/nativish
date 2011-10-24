@@ -1,6 +1,7 @@
 goog.require('mongo2sql');
 goog.require('uuid');
 goog.require('goog.json');
+goog.require('goog.object');
 goog.require('Deferred');
 goog.require('string.inflection');
 goog.require('nativish.SQLStatement');
@@ -143,7 +144,7 @@ nativish.Model.prototype.updateTimestamp = function (var_fields) {
  * @param {!Object} values
  */
 nativish.Model.prototype.update = function (values) {
-	Object.keys(values).forEach(function (field) {
+	goog.object.getKeys(values).forEach(function (field) {
 		this[field] = values[field];
 	}, this);
 };
@@ -227,7 +228,7 @@ nativish.Model.prototype.remove = function () {
 nativish.Model.prototype.extractDoc_ = function () {
 	var doc = this.doc;
 	var skip = nativish.Model.skip_fields;
-	Object.keys(doc).forEach(function (key) {
+	goog.object.getKeys(doc).forEach(function (key) {
 		var field = key.replace('__', ':');
 
 		if (skip.indexOf(field) !== -1) return;
@@ -260,7 +261,7 @@ nativish.Model.prototype.fillDoc_ = function (doc) {
 	if (doc['_parent'] !== undefined || this.parent) {
 		doc['_parent'] = this.parent;
 	}
-	Object.keys(this).forEach(function (key) {
+	goog.object.getKeys(this).forEach(function (key) {
 		if (key.search(':') !== -1) { // field
 			doc[key] = this[key];
 		}
@@ -482,7 +483,7 @@ nativish.Model.api = function (method, path, data) {
 
 	// headers
 	var headers = nativish.Model.api_headers;
-	Object.keys(headers).forEach(function (key) {
+	goog.object.getKeys(headers).forEach(function (key) {
 		xhr.setRequestHeader(key, headers[key]);
 	});
 
@@ -504,7 +505,7 @@ nativish.Model.api = function (method, path, data) {
 
 	// body
 	var body_parts = [];
-	Object.keys(data || {}).forEach(function (key) {
+	goog.object.getKeys(data || {}).forEach(function (key) {
 		body_parts.push(key + '=' + window.encodeURIComponent(data[key]));
 	});
 	xhr.send(body_parts.join('&'));
@@ -540,7 +541,7 @@ nativish.Model.getRelativeApiPath_ = function (M, selector, association, options
 		var field = M.api_field.replace(/^_id$/, 'id');
 		path = nativish.Model.getRelativeApiPathname_(M, selector[field], association);
 		var query_parts = [];
-		Object.keys(selector).forEach(function (key) {
+		goog.object.getKeys(selector).forEach(function (key) {
 			if (key !== field && key.search(':') !== -1) {
 				query_parts.push(key + '=' + window.encodeURIComponent(selector[key]));
 			}
