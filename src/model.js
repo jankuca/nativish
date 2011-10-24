@@ -273,8 +273,8 @@ nativish.Model.prototype.fillDoc_ = function (doc) {
  * @return {!Object}
  */
 nativish.Model.prototype.getTempDoc_ = function () {
-	return /** @type {!Object} */ window.JSON.parse(
-		window.JSON.stringify(this.doc));
+	return /** @type {!Object} */ goog.json.parse(
+		goog.json.serialize(this.doc));
 };
 
 /**
