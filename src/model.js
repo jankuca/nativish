@@ -181,7 +181,7 @@ nativish.Model.prototype.save = function () {
 
 	this.fillDoc_(doc);
 
-	var st = new SQLStatement(db, this.collection_name, SQLStatement.Modes.UPSERT);
+	var st = new nativish.SQLStatement(db, this.collection_name, nativish.SQLStatement.Modes.UPSERT);
 	st.selector = selector;
 	st.options.limit = 1;
 	st.data = doc;
@@ -208,7 +208,7 @@ nativish.Model.prototype.remove = function () {
 	if (!this.collection_name) {
 		return dfr.complete('failure', new Error('Missing collection name'));
 	}
-	var st = new SQLStatement(db, this.collection_name, SQLStatement.Modes.DELETE);
+	var st = new nativish.SQLStatement(db, this.collection_name, nativish.SQLStatement.Modes.DELETE);
 	st.selector = {
 		'_id': this.id
 	};
@@ -376,10 +376,10 @@ nativish.Model.all = function (M, selector, options) {
 			return dfr.complete('failure', new Error('Missing collection name'));
 		}
 
-		selector = nativish.Model.normalizeSelector_(selector);
+		selector = selector ? nativish.Model.normalizeSelector_(selector) : {};
 
-		var st = new SQLStatement(nativish.Model.db, M.collection_name,
-			SQLStatement.Modes.SELECT);
+		var st = new nativish.SQLStatement(nativish.Model.db, M.collection_name,
+			nativish.SQLStatement.Modes.SELECT);
 		st.selector = selector;
 		st.options = options;
 		st.execute().then(function (rows) {
@@ -459,8 +459,8 @@ nativish.Model.search = function (M, field, words) {
 	field = 'lower([' + field.replace(':', mongo2sql.NAMESPACE_SEPARATOR) + '])';
 	var selector = {};
 	selector[field] = { '$search': words };
-	var st = new SQLStatement(nativish.Model.db, M.collection_name,
-		SQLStatement.Modes.SELECT);
+	var st = new nativish.SQLStatement(nativish.Model.db, M.collection_name,
+		nativish.SQLStatement.Modes.SELECT);
 	st.selector = selector;
 	st.execute().pipe(dfr);
 
