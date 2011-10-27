@@ -13,7 +13,7 @@ goog.provide('nativish.SQLStatement.Modes');
  * @param {string} collection The name of the target collection/table
  * @param {SQLStatement.Modes} mode The mode in which to execute the queries
  */
-var SQLStatement = function (db, collection, mode) {
+ nativish.SQLStatement = function (db, collection, mode) {
 	this.db_ = db;
 	this.collection_ = collection;
 	this.mode_ = mode;
@@ -32,14 +32,15 @@ var SQLStatement = function (db, collection, mode) {
  *   needed if the query in the first mode is not enough.
  * @return {Deferred}
  */
-SQLStatement.prototype.execute = function () {
+nativish.SQLStatement.prototype.execute = function () {
 	var dfr = new Deferred();
 
 	var primary_mode = this.getPrimaryMode_();
 	var sql = this.getSQL_(primary_mode);
+	console.log(sql)
 	this.executeSQL_(sql[0], sql[1]).then(function (result) {
 		if (result.rowsAffected || result.rows.length) {
-			if (primary_mode === SQLStatement.Modes.SELECT) {
+			if (primary_mode === nativish.SQLStatement.Modes.SELECT) {
 				dfr.complete('success', result.rows);
 			} else {
 				dfr.complete('success', result);
@@ -66,7 +67,7 @@ SQLStatement.prototype.execute = function () {
  *   in the query
  * @return {Deferred}
  */
-SQLStatement.prototype.executeSQL_ = function (sql, params) {
+nativish.SQLStatement.prototype.executeSQL_ = function (sql, params) {
 	var dfr = new Deferred();
 
 	this.db_.transaction(function (tx) {
@@ -84,9 +85,9 @@ SQLStatement.prototype.executeSQL_ = function (sql, params) {
  * Returns the mode in which to execute the first query
  * @return {SQLStatement.Modes}
  */
-SQLStatement.prototype.getPrimaryMode_ = function () {
-	if (this.mode_ === SQLStatement.Modes.UPSERT) {
-		return SQLStatement.Modes.UPDATE;
+nativish.SQLStatement.prototype.getPrimaryMode_ = function () {
+	if (this.mode_ === nativish.SQLStatement.Modes.UPSERT) {
+		return nativish.SQLStatement.Modes.UPDATE;
 	}
 	return this.mode_;
 };
@@ -96,29 +97,29 @@ SQLStatement.prototype.getPrimaryMode_ = function () {
  * Currently only UPSERT needs up to two queries.
  * @return {?SQLStatement.Modes}
  */
-SQLStatement.prototype.getSecondaryMode_ = function () {
-	if (this.mode_ === SQLStatement.Modes.UPSERT) {
-		return SQLStatement.Modes.INSERT;
+nativish.SQLStatement.prototype.getSecondaryMode_ = function () {
+	if (this.mode_ === nativish.SQLStatement.Modes.UPSERT) {
+		return nativish.SQLStatement.Modes.INSERT;
 	}
 	return this.mode_ || null;
 };
 
-SQLStatement.prototype.getSQL_ = function (mode) {
+nativish.SQLStatement.prototype.getSQL_ = function (mode) {
 	switch (mode) {
-		case SQLStatement.Modes.SELECT:
+		case nativish.SQLStatement.Modes.SELECT:
 			return this.getSelectSQL_();
-		case SQLStatement.Modes.INSERT:
+		case nativish.SQLStatement.Modes.INSERT:
 			return this.getInsertSQL_();
-		case SQLStatement.Modes.UPDATE:
+		case nativish.SQLStatement.Modes.UPDATE:
 			return this.getUpdateSQL_();
-		case SQLStatement.Modes.DELETE:
-			return this.getUpdateSQL_();
+		case nativish.SQLStatement.Modes.DELETE:
+			return this.getDeleteSQL_();
 		default:
-			throw new Error('Invalid SQLStatement mode');
+			throw new Error('Invalid nativish.SQLStatement mode');
 	}
 };
 
-SQLStatement.prototype.getSelectSQL_ = function () {
+nativish.SQLStatement.prototype.getSelectSQL_ = function () {
 	var selector = this.selector;
 	var options = this.options;
 
@@ -167,7 +168,7 @@ SQLStatement.prototype.getSelectSQL_ = function () {
 	return [sql, params];
 };
 
-SQLStatement.prototype.getInsertSQL_ = function () {
+nativish.SQLStatement.prototype.getInsertSQL_ = function () {
 	var selector = this.selector;
 	var options = this.options;
 	var data = this.data;
@@ -190,7 +191,7 @@ SQLStatement.prototype.getInsertSQL_ = function () {
 	return [sql, params];
 };
 
-SQLStatement.prototype.getUpdateSQL_ = function () {
+nativish.SQLStatement.prototype.getUpdateSQL_ = function () {
 	var selector = this.selector;
 	var options = this.options;
 	var data = this.data;
@@ -220,7 +221,7 @@ SQLStatement.prototype.getUpdateSQL_ = function () {
 	return [sql, params];
 };
 
-SQLStatement.prototype.getDeleteSQL_ = function () {
+nativish.SQLStatement.prototype.getDeleteSQL_ = function () {
 	var selector = this.selector;
 	var options = this.options;
 
@@ -243,7 +244,7 @@ SQLStatement.prototype.getDeleteSQL_ = function () {
 /**
  * @enum
  */
-SQLStatement.Modes = {
+nativish.SQLStatement.Modes = {
 	SELECT: 1,
 	INSERT: 2,
 	UPDATE: 3,
