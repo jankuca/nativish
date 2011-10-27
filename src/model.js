@@ -349,7 +349,7 @@ nativish.Model.one = function (M, selector, options) {
 /**
  * Retrieves the first record matching the selector
  * @param {Function} M The model constructor to use for the results
- * @param {!Object|string|number} selector
+ * @param {!Object|string|number=} selector
  * @param {Object=} options
  * @return {Deferred}
  */
@@ -492,9 +492,9 @@ nativish.Model.api = function (method, path, data) {
 		if (xhr.readyState === 4) {
 			var result = null;
 			try {
-				result = goog.json.unsafeParse(xhr.responseText);
+				result = goog.json.unsafeParse(xhr.responseText || null);
 			} finally {
-				if (xhr.status < 400) {
+				if (xhr.status < 400 && xhr.status !== 0) {
 					dfr.complete('success', result);
 				} else {
 					dfr.complete('failure', xhr.status);
