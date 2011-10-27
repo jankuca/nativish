@@ -37,7 +37,6 @@ nativish.SQLStatement.prototype.execute = function () {
 
 	var primary_mode = this.getPrimaryMode_();
 	var sql = this.getSQL_(primary_mode);
-	console.log(sql)
 	this.executeSQL_(sql[0], sql[1]).then(function (result) {
 		if (result.rowsAffected || result.rows.length) {
 			if (primary_mode === nativish.SQLStatement.Modes.SELECT) {
